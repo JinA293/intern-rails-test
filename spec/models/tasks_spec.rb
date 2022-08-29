@@ -32,17 +32,15 @@ describe Task, type: :model do
 
         it 'reviewステータスには遷移せず、値は更新されない' do
           # subjectでテスト対象のメソッドを実行
-          subject
           # Task.find(task.id).statusがtodoのままであることを確認
           expect(Task.find(task.id).status).to eq(Task::STATUS[:todo])
         end
       end
 
-      context '引数にreviewの数字（4）を渡すと' do
+      context '引数にcompletedの数字（4）を渡すと' do
         let!(:status) { Task::STATUS[:completed] }
 
         it 'completedステータスには遷移せず、値は更新されない' do
-          subject
           expect(Task.find(task.id).status).to eq(Task::STATUS[:todo])
         end
       end
@@ -51,12 +49,88 @@ describe Task, type: :model do
     context 'タスクがdoingの場合' do
       let!(:task) { FactoryBot.create(:task, :doing) }
 
-      context '何をすると' do
-        it 'どうなるか' do
-          subject
-          expect(Task.find(task.id).status).to eq('何と一致するか')
+      context '引数にtodoの数字(1)を渡すと' do
+        let!(:status) { Task::STATUS[:todo] }
+
+        it 'doing(2)からtodo(1)にステータスが変更される' do
+          expect { subject }.to change { Task.find(task.id).status }.from(Task::STATUS[:doing]).to(Task::STATUS[:todo])
+        end
+      end
+
+      context '引数にreviewの数字(3)を渡すと' do
+        let!(:status) { Task::STATUS[:review] }
+
+        it 'doing(2)からreview(3)にステータスが変更される' do
+          expect { subject }.to change { Task.find(task.id).status }.from(Task::STATUS[:doing]).to(Task::STATUS[:review])
+        end
+      end
+
+      context '引数にcompletedの数字(4)を渡すと' do
+        let!(:status) { Task::STATUS[:completed] }
+
+        it 'doing(2)からcompleted(4)にステータスが変更される' do
+          expect { subject }.to change { Task.find(task.id).status }.from(Task::STATUS[:doing]).to(Task::STATUS[:completed])
+        end
+      end
+    end
+
+    context 'タスクがreviewの場合' do
+      let!(:task) { FactoryBot.create(:task, :review) }
+
+      context '引数にtodoの数字(1)を渡すと' do
+        let!(:status) { Task::STATUS[:todo] }
+
+        it 'todoステータスには遷移せず、値は更新されない' do
+          expect(Task.find(task.id).status).to eq(Task::STATUS[:review])
+        end
+      end
+
+      context '引数にdoingの数字(2)を渡すと' do
+        let!(:status) { Task::STATUS[:doing] }
+
+        it 'review(3)からdoing(2)にステータスが変更される' do
+          expect { subject }.to change { Task.find(task.id).status }.from(Task::STATUS[:review]).to(Task::STATUS[:doing])
+        end
+      end
+
+      context '引数にcompletedの数字(4)を渡すと' do
+        let!(:status) { Task::STATUS[:completed] }
+        
+        it 'review(3)からcompleted(4)にステータスが変更される' do
+          expect { subject }.to change { Task.find(task.id).status }.from(Task::STATUS[:review]).to(Task::STATUS[:completed])
+        end
+      end
+    end
+
+    context 'タスクがcompletedの場合' do
+      let!(:task) { FactoryBot.create(:task, :completed) }
+
+      context '引数にtodoの数字(1)を渡すと' do
+        let!(:status) { Task::STATUS[:todo] }
+
+        it 'todoステータスには遷移せず、値は更新されない' do
+          expect(Task.find(task.id).status).to eq(Task::STATUS[:completed])
+        end
+      end
+
+      context '引数にdoingの数字(2)を渡すと' do
+        let!(:status) { Task::STATUS[:doing] }
+
+        it 'doingステータスには遷移せず、値は更新されない' do
+          expect(Task.find(task.id).status).to eq(Task::STATUS[:completed])
+        end
+      end
+
+      context '引数にreviewの数字(3)を渡すと' do
+        let!(:status) { Task::STATUS[:review] }
+
+        it 'revirewステータスには遷移せず、値は更新されない' do
+          expect(Task.find(task.id).status).to eq(Task::STATUS[:completed])
         end
       end
     end
   end
 end
+
+#とりあえず見様見真似で書いたが、実行結果が毎回異なる
+#string contains null byteのエラーが出たりでなかったり
