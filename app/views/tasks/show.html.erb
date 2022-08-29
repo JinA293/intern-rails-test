@@ -10,6 +10,9 @@
     <h2><%= @task.title %></h2>
     <%= form_with url: "/tasks/#{@task.id}/update_status", method: :put, local: true do |form| %>
       <%= form.select :status, Task::STATUS.to_a, { selected: @task.status }, { class: "form-select mr-3 mt-5","aria-label": "Default select example"} %>
+      <%# 課題➀ %>
+      <%# 書き方 <%= f.select 属性, 選択肢の集合, {オプション}, {HTMLオプション} %>
+      <%# task.rbのSTATUSをto_aで配列化して選択肢として表示%>
       <%= form.submit "更新", class: "btn btn-primary btn-sm"  %>
     <% end %>
 

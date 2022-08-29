@@ -62,7 +62,7 @@ class TasksController < ApplicationController
     status = params[:status].to_i
     task_id = params[:task_id].to_i
     @task = Task.find(task_id)
-
+    # 課題➀
     if @task.update(status: status)
       redirect_to "/tasks/#{@task.id}", flash: { success: 'ステータス更新に成功しました' }
     else
