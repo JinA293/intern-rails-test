@@ -18,15 +18,16 @@
     </li>
   </ul>
   <div>
+    <%# 課題➂ %>
     <%= form_with url: "/tasks", method: :get, local: true do |form| %>
       <div class="d-flex justify-content-end align-items-center mb-3 mt-3">
         <%= form.hidden_field :status_filter, :value => @status_filter %>
         <%= form.label "検索ワード：", class: "mr-1 mb-0" %><br>
-        <%= form.text_field :search_words, class: "mr-4"%><br><br>
+        <%= form.text_field :search_words, class: "mr-4"%><br><br> <%# 検索ワードのフィールド %>
         <%= form.label "期限：", class: "mr-1 mb-0"%><br>
-        <%= form.date_field :due_date_start, class: "mr-3" %><br>
+        <%= form.date_field :due_date_start, class: "mr-3" %><br> <%# 開始日のフィールド %>
         <div class="mr-3">～</div>
-        <%= form.date_field :due_date_end, class: "mr-5" %><br>
+        <%= form.date_field :due_date_end, class: "mr-5" %><br> <%# 終了日のフィールド %>
         <%= form.submit "検索", class: "btn btn-primary btn-sm mr-5" %>
       </div>
     <% end %>
