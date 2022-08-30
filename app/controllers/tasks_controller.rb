@@ -14,16 +14,27 @@ class TasksController < ApplicationController
     # filtered_tasks = filtered_tasks.order(:created_at)
     ###
 
-    if params[:search_words] != nil # 検索欄に入力されたときのみ検索
-      filtered_tasks_by_title = all_tasks.where("title LIKE ?", "%#{params[:search_words]}%")
-      filtered_tasks_by_description = all_tasks.where("description LIKE ?", "%#{params[:search_words]}%")
-      filtered_tasks = filtered_tasks_by_title + filtered_tasks_by_description
-      filtered_tasks = filtered_tasks.uniq #配列の結合の際に重複するデータを削除
-    end
+    # if params[:search_words] != nil # 検索欄に入力されたときのみ検索
+    #   filtered_tasks_by_title = all_tasks.where("title LIKE ?", "%#{params[:search_words]}%")
+    #   filtered_tasks_by_description = all_tasks.where("description LIKE ?", "%#{params[:search_words]}%")
+    #   filtered_tasks = filtered_tasks_by_title + filtered_tasks_by_description
+    #   filtered_tasks = filtered_tasks.uniq #配列の結合の際に重複するデータを削除
+    # end
 
     if params[:due_date_start] and params[:due_date_end] != nil # 検索欄に何か入力されたときのみ検索
-      filtered_tasks_by_date = all_tasks.where(due_date: "%#{params[:search_words]}%".."%#{params[:due_date_end]}%")
+      filtered_tasks_by_date = all_tasks.where(due_date: "%#{params[:due_date_start]}%".."%#{params[:due_date_end]}%")
+    # elsif params[:due_date_start] != nil and params[:due_date_end] = nil
+    #   filtered_tasks_by_date = all_tasks.where("due_date >= ?", params[:due_date_start])
+    # elsif params[:due_date_start] = nil and params[:due_date_end] != nil
+    #   filtered_tasks_by_date = all_tasks.where("due_date <= ?", params[:due_date_end])
     end
+
+    # filtered_tasks_by_date = all_tasks.where("due_date >= ?", params[:due_date_start])
+
+    # filtered_tasks_by_date = all_tasks.where("due_date >= ?", '2022-09-01')
+
+    # filtered_tasks_by_date = all_tasks.where(due_date: '2022-09-01'..'2022-09-10')
+
 
     # 検索語句 string
     # ex) "検索ワード"
@@ -37,8 +48,8 @@ class TasksController < ApplicationController
     # ex) "yyyy-mm-dd"
     logger.debug("期限の絞り込み終了日はparams[:due_date_end]で取得可能です。\n値：#{params[:due_date_end]}")
 
-    if filtered_tasks != nil
-      @tasks = filtered_tasks
+    if filtered_tasks_by_date != nil
+      @tasks = filtered_tasks_by_date
     else
       @tasks = all_tasks
     end
