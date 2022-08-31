@@ -133,4 +133,6 @@ describe Task, type: :model do
 end
 
 #とりあえず見様見真似で書いたが、実行結果が毎回異なる
-#string contains null byteのエラーが出たりでなかったり
+#string contains null byteのエラーが出たりでなかったりする
+#テストは通ったので特に調べるなどはしなかった
+
