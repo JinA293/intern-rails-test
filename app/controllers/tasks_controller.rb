@@ -6,7 +6,7 @@ class TasksController < ApplicationController
   # ?utf8=✓&status_filter=0&search_words=&due_date_start=&due_date_end=&commit=検索
   def index
     @status_filter = params[:status_filter].to_i
-    all_tasks = @status_filter.zero? ? Task.all : Task.where(status: @status_filter) # 初期値なのでall_tasksに変更
+    all_tasks = @status_filter.zero? ? Task.all : Task.where(status: @status_filter) # 初期値なので変数名をall_tasksに変更
     ###
     # クエリサンプル
     # filtered_tasksにメソッドチェーンすることで以下のようにクエリ条件を追加することが可能です
@@ -14,26 +14,45 @@ class TasksController < ApplicationController
     # filtered_tasks = filtered_tasks.order(:created_at)
     ###
 
-    # if params[:search_words] != nil # 検索欄に入力されたときのみ検索
-    #   filtered_tasks_by_title = all_tasks.where("title LIKE ?", "%#{params[:search_words]}%")
-    #   filtered_tasks_by_description = all_tasks.where("description LIKE ?", "%#{params[:search_words]}%")
-    #   filtered_tasks = filtered_tasks_by_title + filtered_tasks_by_description
-    #   filtered_tasks = filtered_tasks.uniq #配列の結合の際に重複するデータを削除
-    # end
-
-    if params[:due_date_start] and params[:due_date_end] != nil # 検索欄に何か入力されたときのみ検索
-      filtered_tasks_by_date = all_tasks.where(due_date: "%#{params[:due_date_start]}%".."%#{params[:due_date_end]}%")
-    # elsif params[:due_date_start] != nil and params[:due_date_end] = nil
-    #   filtered_tasks_by_date = all_tasks.where("due_date >= ?", params[:due_date_start])
-    # elsif params[:due_date_start] = nil and params[:due_date_end] != nil
-    #   filtered_tasks_by_date = all_tasks.where("due_date <= ?", params[:due_date_end])
+    #railsのSQLの書き方を調べ実装。
+    if params[:search_words] != nil # 検索欄に入力されたときのみ検索
+      filtered_tasks_by_title = all_tasks.where("title LIKE ?", "%#{params[:search_words]}%")
+      filtered_tasks_by_description = all_tasks.where("description LIKE ?", "%#{params[:search_words]}%")
+      filtered_tasks = filtered_tasks_by_title + filtered_tasks_by_description
+      filtered_tasks = filtered_tasks.uniq #配列の結合の際に重複するデータを削除
     end
 
-    # filtered_tasks_by_date = all_tasks.where("due_date >= ?", params[:due_date_start])
+    # if params[:due_date_start] != nil and params[:due_date_end] != nil #日付が入力されたときのみ検索、ここのif文が機能しない
+    #   filtered_tasks = all_tasks.where(due_date: "%#{params[:due_date_start]}%".."%#{params[:due_date_end]}%")
+    # end
 
-    # filtered_tasks_by_date = all_tasks.where("due_date >= ?", '2022-09-01')
+    # キーワード検索と日付検索を両立した実装はできず、さらに文字検索をするときは日付検索をコメントアウトする必要がある。
+    
+    # if filtered_tasks_by_word != nil #キーワード検索がされていた場合、そこからまた日付で絞り込む
+    #   if params[:due_date_start] != nil and params[:due_date_end] != nil
+    #     filtered_tasks_by_date = filtered_tasks_by_word.where(due_date: "%#{params[:due_date_start]}%".."%#{params[:due_date_end]}%")
+    #   # elsif params[:due_date_start] != nil and params[:due_date_end] == nil
+    #   # filtered_tasks_by_date = all_tasks.where("due_date >= ?", params[:due_date_start]) # なぜかこのelsifに進まない
+    #   # elsif params[:due_date_start] == nil and params[:due_date_end] != nil
+    #   # filtered_tasks_by_date = all_tasks.where("due_date <= ?", params[:due_date_end])
+    #   end
+    # elsif #キーワード検索がなされていない場合は全てのタスクから日付検索
+      # if params[:due_date_start] != nil and params[:due_date_end] != nil
+      #   filtered_tasks = all_tasks.where(due_date: "%#{params[:due_date_start]}%".."%#{params[:due_date_end]}%")
+      # elsif params[:due_date_start] != nil and params[:due_date_end] == nil
+      # filtered_tasks_by_date = all_tasks.where("due_date >= ?", params[:due_date_start]) # なぜかこのelsifに進まない
+      # elsif params[:due_date_start] == nil and params[:due_date_end] != nil
+      #   filtered_tasks_by_date = all_tasks.where("due_date <= ?", params[:due_date_end])
+      # end
+    # end
+    
+    #キーワード検索したものを日付検索しようとすると下記のエラーが出て進まない。
+    # ndefined method `where' for #<Array:0x00007f850482b460> Did you mean? when 解決法不明
 
-    # filtered_tasks_by_date = all_tasks.where(due_date: '2022-09-01'..'2022-09-10')
+    # 以下テストコード
+    # filtered_tasks_by_date = all_tasks.where("due_date >= ?", params[:due_date_start]) 動く
+    # filtered_tasks_by_date = all_tasks.where("due_date >= ?", '2022-09-01') 動く
+    # filtered_tasks_by_date = all_tasks.where(due_date: '2022-09-01'..'2022-09-10') 動く
 
 
     # 検索語句 string
@@ -48,8 +67,8 @@ class TasksController < ApplicationController
     # ex) "yyyy-mm-dd"
     logger.debug("期限の絞り込み終了日はparams[:due_date_end]で取得可能です。\n値：#{params[:due_date_end]}")
 
-    if filtered_tasks_by_date != nil
-      @tasks = filtered_tasks_by_date
+    if filtered_tasks != nil
+      @tasks = filtered_tasks
     else
       @tasks = all_tasks
     end
